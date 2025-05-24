@@ -1,23 +1,26 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using ImageGenerator.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем сервисы для поддержки контроллеров
+var connString = "Host=localhost;Port=5432;Database=ImageDB;Username=postgres;Password=1122";
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connString));
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Обработчик для корневого пути "/"
 app.MapGet("/", () => "Сервер работает!");
 app.MapGet("/api/create-sample/", () => HandleRequest());
 
-
-// Маппинг контроллеров
 app.MapControllers();   
 
-// Запуск приложения на порту 5000
 app.Run("http://localhost:5000");
 
 static string HandleRequest()
@@ -25,12 +28,5 @@ static string HandleRequest()
     return "Hello world!";
 }
 
-public class ImageJson
-{
-    public double NameXPos;
-    public double NameYPos;
-    public double ScaleFactor;
-    public int FontSize;
 
-}
 
