@@ -8,10 +8,10 @@ namespace ImageGenerator
 {
     public class UpdateImageMetadataRequest
     {
-        public string Title { get; set; }
-        public double NameXPos { get; set; }
-        public double NameYPos { get; set; }
-        public double ScaleFactor { get; set; }
-        public double FontSize { get; set; }
+        public string title { get; set; }
+        public double xPos { get; set; }
+        public double yPos { get; set; }
+        public double scaleFactor { get; set; }
+        public double fontSize { get; set; }
     }
 }

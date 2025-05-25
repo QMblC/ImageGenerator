@@ -21,11 +21,11 @@ namespace ImageGenerator
     {
         public class ImageJson
         {
-            public string Title { get; set; }
-            public double NameXPos { get; set; }
-            public double NameYPos { get; set; }
-            public double ScaleFactor { get; set; }
-            public double FontSize { get; set; }
+            public string title { get; set; }
+            public double xPos { get; set; }
+            public double yPos { get; set; }
+            public double scaleFactor { get; set; }
+            public double fontSize { get; set; }
         }
 
         public class ImageUploadRequest
@@ -43,17 +43,17 @@ namespace ImageGenerator
 
             var metadata = new
             {
-                Title = imageEntity.Title,
-                imageEntity.NameXPos,
-                imageEntity.NameYPos,
-                imageEntity.ScaleFactor,
-                imageEntity.FontSize
+                Title = imageEntity.title,
+                imageEntity.xPos,
+                imageEntity.yPos,
+                imageEntity.scaleFactor,
+                imageEntity.fontSize
             };
 
             return Ok(new
             {
-                FileName = imageEntity.FileName,
-                FileDataBase64 = Convert.ToBase64String(imageEntity.FileData),
+                FileName = imageEntity.fileName,
+                FileDataBase64 = Convert.ToBase64String(imageEntity.fileData),
                 Metadata = metadata
             });
         }
@@ -96,12 +96,11 @@ namespace ImageGenerator
             if (imageEntity == null)
                 return NotFound();
 
-            // Обновляем поля
-            imageEntity.Title = metadata.Title;
-            imageEntity.NameXPos = metadata.NameXPos;
-            imageEntity.NameYPos = metadata.NameYPos;
-            imageEntity.ScaleFactor = metadata.ScaleFactor;
-            imageEntity.FontSize = metadata.FontSize;
+            imageEntity.title = metadata.title;
+            imageEntity.xPos = metadata.xPos;
+            imageEntity.yPos = metadata.yPos;
+            imageEntity.scaleFactor = metadata.scaleFactor;
+            imageEntity.fontSize = metadata.fontSize;
 
             try
             {
@@ -151,13 +150,13 @@ namespace ImageGenerator
 
             var imageEntity = new ImageEntity
             {
-                FileName = request.File.FileName,
-                FileData = fileBytes,
-                Title = metadata.Title,
-                NameXPos = metadata.NameXPos,
-                NameYPos = metadata.NameYPos,
-                ScaleFactor = metadata.ScaleFactor,
-                FontSize = metadata.FontSize
+                fileName = request.File.FileName,
+                fileData = fileBytes,
+                title = metadata.title,
+                xPos = metadata.xPos,
+                yPos = metadata.yPos,
+                scaleFactor = metadata.scaleFactor,
+                fontSize = metadata.fontSize
             };
 
             context.Images.Add(imageEntity);
@@ -170,13 +169,13 @@ namespace ImageGenerator
                 return StatusCode(500, $"Ошибка при сохранении в базу: {ex.Message}");
             }
 
-            if (imageEntity.Id == 0)
+            if (imageEntity.id == 0)
                 return StatusCode(500, "Ошибка сохранения в базу");
 
             return Ok(new
             {
                 Message = "Данные успешно сохранены в базе",
-                ImageId = imageEntity.Id
+                ImageId = imageEntity.id
             });
         }
 
@@ -184,20 +183,20 @@ namespace ImageGenerator
         public async Task<IActionResult> GetFirstNImages(int count, [FromServices] AppDbContext context)
         {
             var images = await context.Images
-                .OrderBy(i => i.Id)
+                .OrderBy(i => i.id)
                 .Take(count)
                 .Select(i => new
                 {
-                    i.Id,
-                    i.FileName,
-                    FileDataBase64 = Convert.ToBase64String(i.FileData),
+                    i.id,
+                    i.fileName,
+                    FileDataBase64 = Convert.ToBase64String(i.fileData),
                     Metadata = new
                     {
-                        i.Title,
-                        i.NameXPos,
-                        i.NameYPos,
-                        i.ScaleFactor,
-                        i.FontSize
+                        i.title,
+                        i.xPos,
+                        i.yPos,
+                        i.scaleFactor,
+                        i.fontSize
                     }
                 })
                 .ToListAsync();

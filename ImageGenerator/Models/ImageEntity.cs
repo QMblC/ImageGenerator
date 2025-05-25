@@ -10,16 +10,16 @@ namespace ImageGenerator.Models
     public class ImageEntity
     {
         [Key]
-        public int Id { get; set; }
+        public int id { get; set; }
 
-        public string Title { get; set; }
+        public string title { get; set; }
 
-        public string FileName { get; set; } = "";
-        public byte[] FileData { get; set; } = Array.Empty<byte>();
+        public string fileName { get; set; } = "";
+        public byte[] fileData { get; set; } = Array.Empty<byte>();
 
-        public double NameXPos { get; set; }
-        public double NameYPos { get; set; }
-        public double ScaleFactor { get; set; }
-        public double FontSize { get; set; }
+        public double xPos { get; set; }
+        public double yPos { get; set; }
+        public double scaleFactor { get; set; }
+        public double fontSize { get; set; }
     }
 }
