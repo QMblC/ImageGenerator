@@ -20,6 +20,7 @@ namespace ImageGenerator
     {
         public class ImageJson
         {
+            public string Title { get; set; }
             public double NameXPos { get; set; }
             public double NameYPos { get; set; }
             public double ScaleFactor { get; set; }
@@ -41,6 +42,7 @@ namespace ImageGenerator
 
             var metadata = new
             {
+                Title = imageEntity.Title,
                 imageEntity.NameXPos,
                 imageEntity.NameYPos,
                 imageEntity.ScaleFactor,
@@ -91,6 +93,7 @@ namespace ImageGenerator
             {
                 FileName = request.File.FileName,
                 FileData = fileBytes,
+                Title = metadata.Title,
                 NameXPos = metadata.NameXPos,
                 NameYPos = metadata.NameYPos,
                 ScaleFactor = metadata.ScaleFactor,
