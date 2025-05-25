@@ -31,7 +31,7 @@ namespace ImageGenerator
         public class ImageUploadRequest
         {
             public IFormFile File { get; set; }
-            public IFormFile MetadataJson { get; set; }  
+            public IFormFile MetadataJson { get; set; }
         }
 
         [HttpGet("{id}")]
@@ -180,8 +180,29 @@ namespace ImageGenerator
             });
         }
 
-        
+        [HttpGet("first/{count}")]
+        public async Task<IActionResult> GetFirstNImages(int count, [FromServices] AppDbContext context)
+        {
+            var images = await context.Images
+                .OrderBy(i => i.Id)
+                .Take(count)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.FileName,
+                    FileDataBase64 = Convert.ToBase64String(i.FileData),
+                    Metadata = new
+                    {
+                        i.Title,
+                        i.NameXPos,
+                        i.NameYPos,
+                        i.ScaleFactor,
+                        i.FontSize
+                    }
+                })
+                .ToListAsync();
 
+            return Ok(images);
+        }
     }
-
 }
