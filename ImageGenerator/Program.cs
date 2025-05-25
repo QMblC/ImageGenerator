@@ -21,7 +21,7 @@ app.MapGet("/api/create-sample/", () => HandleRequest());
 
 app.MapControllers();   
 
-app.Run("http://localhost:5000");
+app.Run("http://0.0.0.0:5000");
 
 static string HandleRequest()
 {

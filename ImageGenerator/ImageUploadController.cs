@@ -12,6 +12,7 @@ namespace ImageGenerator
     using ImageGenerator.Models;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using System.Text.Json;
 
     [ApiController]
@@ -56,6 +57,65 @@ namespace ImageGenerator
                 Metadata = metadata
             });
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteImage(int id, [FromServices] AppDbContext context)
+        {
+            var imageEntity = await context.Images.FindAsync(id);
+            if (imageEntity == null)
+                return NotFound($"Изображение с Id={id} не найдено.");
+
+            context.Images.Remove(imageEntity);
+            await context.SaveChangesAsync();
+
+            return Ok(new { Message = $"Изображение с Id={id} успешно удалено." });
+        }
+
+        [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateImage(int id, [FromForm] IFormFile MetadataJson, [FromServices] AppDbContext context)
+        {
+            if (MetadataJson == null || MetadataJson.Length == 0)
+                return BadRequest("Файл метаданных не загружен.");
+
+            ImageJson metadata;
+            using (var reader = new StreamReader(MetadataJson.OpenReadStream()))
+            {
+                var jsonString = await reader.ReadToEndAsync();
+                try
+                {
+                    metadata = JsonSerializer.Deserialize<ImageJson>(jsonString);
+                }
+                catch (JsonException ex)
+                {
+                    return BadRequest($"Ошибка разбора JSON: {ex.Message}");
+                }
+            }
+
+            var imageEntity = await context.Images.FindAsync(id);
+            if (imageEntity == null)
+                return NotFound();
+
+            // Обновляем поля
+            imageEntity.Title = metadata.Title;
+            imageEntity.NameXPos = metadata.NameXPos;
+            imageEntity.NameYPos = metadata.NameYPos;
+            imageEntity.ScaleFactor = metadata.ScaleFactor;
+            imageEntity.FontSize = metadata.FontSize;
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при обновлении: {ex.Message}");
+            }
+
+            return Ok(new { Message = "Данные успешно обновлены" });
+        }
+
+
 
         [HttpPost("upload")]
         public async Task<IActionResult> Upload([FromForm] ImageUploadRequest request, [FromServices] AppDbContext context)
@@ -119,6 +179,9 @@ namespace ImageGenerator
                 ImageId = imageEntity.Id
             });
         }
+
+        
+
     }
 
 }
