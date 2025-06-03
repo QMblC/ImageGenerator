@@ -9,6 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connString = "Host=localhost;Port=5432;Database=ImageDB;Username=postgres;Password=1122";
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connString));
 
@@ -17,16 +28,11 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.MapGet("/", () => "Сервер работает!");
-app.MapGet("/api/create-sample/", () => HandleRequest());
+app.UseCors("AllowAll");
 
 app.MapControllers();   
 
 app.Run("http://0.0.0.0:5000");
-
-static string HandleRequest()
-{
-    return "Hello world!";
-}
 
 
 
